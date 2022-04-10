@@ -8,7 +8,6 @@ let totalPriceValue = 0;
 
 
 
-
 ArrayDetails();
 
 
@@ -93,22 +92,25 @@ async function ArrayDetails() {
                 quantityDetails.max = '100';
                 quantityDetails.setAttribute("value", productInCart.quantity);
 
-                totalQuantityValue = totalQuantityValue+parseInt(productInCart.quantity);
-                totalQuantity.innerHTML = totalQuantityValue;
-
-                modifyQuantityInLsAndPriceInDom();
-                function modifyQuantityInLsAndPriceInDom() {
-                    quantityDetails.addEventListener('change', function (e) {
-                        const euroFormat = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(getPrice*quantityDetails.value)
-                        productPrice.innerText = euroFormat;
-                        getProductsInArray.forEach(element => {
-                            if(element.id === productInCart.id) {
-                                element.quantity = e.target.value;
-                            }
-                        });
-                        localStorage.setItem("products", JSON.stringify(getProductsInArray));
+                quantityDetails.addEventListener('change', function (e) {
+                    const euroFormat = new Intl.NumberFormat("fr-FR", {style: "currency", currency: "EUR"}).format(getPrice*quantityDetails.value)
+                    productPrice.innerText = euroFormat;
+                    getProductsInArray.forEach(element => {
+                        if(element.id === productInCart.id) {
+                            element.quantity = e.target.value;
+                        }
                     });
-                };
+                    localStorage.setItem("products", JSON.stringify(getProductsInArray));
+                
+                quantityDetails.addEventListener("change", () => {
+                    const quantityInLs = getProductsInArray.map(ele => ele.quantity);
+                    quantityInLs.forEach((quantity) => {
+                        totalQuantityValue = totalQuantityValue+parseInt(quantity);
+                        totalQuantity.innerHTML = totalQuantityValue;
+                    })
+                });
+
+                });
 
                 const deleteProduct = document.createElement("div");
                 const deleteProductP = document.createElement("p");
@@ -127,79 +129,114 @@ async function ArrayDetails() {
                         localStorage.setItem("products", JSON.stringify(getProductsInArray));
                     })
                 }
-
             }
-        })               
+        })
+
+
+        
+        
+        /** totalQuantityValue = totalQuantityValue+parseInt(quantityInLs);
+        totalQuantity.innerHTML = totalQuantityValue;*/ 
 }
 
 
+/**Fonctions spécifiques de la page */
 
 
 
 
 
-/** Cibler les diférents inputs du formulaire */
-const order = document.getElementById("order");
-const firstName = document.getElementById("firstName");
-const lastName = document.getElementById("lastName");
-const address = document.getElementById("address");
-const city = document.getElementById("city");
-const email = document.getElementById("email");
 
-/** Regex des inputs */
-const validateFirstNameOrLastNameOrCity = /^\w+([-'\s]\w+)?/;
-const validateAdress = /^[0-9]*[\s]\w+([-'\s]\w)?/;
-const validateEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
 
 /** Au clic sur le bouton "Commander !", paramétrage des actions efféctuées en fonction des conditions */
 checkForm();
 
 function checkForm() {
+/** Cibler les diférents inputs du formulaire */
+    const order = document.getElementById("order");
+    const firstName = document.getElementById("firstName");
+    const firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
+    const lastName = document.getElementById("lastName");
+    const lastNameErrorMsg = document.getElementById("lastNameErrorMsg");
+    const address = document.getElementById("address");
+    const addressErrorMsg = document.getElementById("addressErrorMsg");
+    const city = document.getElementById("city");
+    const cityErrorMsg = document.getElementById("cityErrorMsg");
+    const email = document.getElementById("email");
+    const emailErrorMsg = document.getElementById("emailErrorMsg");
+
+/** Regex des inputs */
+    const validateFirstNameOrLastNameOrCity = /^\w+([-'\s]\w+)?/;
+    const validateAdress = /^[0-9]*[\s]\w+([-'\s]\w)?/;
+    const validateEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
     order.addEventListener('click', (e) => {
-        if(
-            validateFirstNameOrLastNameOrCity.test(firstName.value) == false ||
-            validateFirstNameOrLastNameOrCity.test(lastName.value) == false ||
-            validateAdress.test(address.value) == false ||
-            validateFirstNameOrLastNameOrCity.test(city.value) == false ||
-            validateEmail.test(email.value) == false) {
-                e.preventDefault();
-                alert("Veuillez vérifier que vous n'avez laissé aucun champ vide, ou que les champs soient correctement remplis.")
-        }
+        e.preventDefault();
+        if(validateFirstNameOrLastNameOrCity.test(firstName.value) == false) {
+            firstNameErrorMsg.textContent = "Format du prénom incorrect";
+        } 
         else {
-            e.preventDefault();
-            const order = {
-                contact: {
-                    firstName:  firstName.value,
-                    lastName: lastName.value,
-                    address: address.value,
-                    city: city.value,
-                    email: email.value,
-                },
-                products: getProductsInArray.map(ele => ele.id),
-            };
-            console.log(order);
-
-            send();
-            async function send() {
-                await fetch("http://localhost:3000/api/products/order", {
-                    method: "POST",
-                    body: JSON.stringify(order),
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json"
-                    },
-                })
-
-                .then((res) => res.json())
-                .then((data) => {
-                    window.location.href = `../html/confirmation.html?id=${data.orderId}`;
-                })
-                .catch(() => {
-                    alert("Une erreur est survenue.")
-                });
-            }
+            firstNameErrorMsg.textContent = "";
         }
-    });
+        if(validateFirstNameOrLastNameOrCity.test(lastName.value) == false) {
+            lastNameErrorMsg.textContent = "Format du nom incorrect";
+        } 
+        else {
+            lastNameErrorMsg.textContent = "";
+        }
+        if(validateAdress.test(address.value) == false) {
+            addressErrorMsg.textContent = "Format de l'adresse incorrect";
+        } 
+        else {
+            addressErrorMsg.textContent = "";
+        }
+        if(validateFirstNameOrLastNameOrCity.test(city.value) == false) {
+            cityErrorMsg.textContent = "Format de la ville incorrect";
+        } 
+        else {
+            cityErrorMsg.textContent = "";
+        }
+        if(validateEmail.test(email.value) == false) {
+            emailErrorMsg.textContent = "Format de l'email incorrect";
+        } 
+        else {
+            emailErrorMsg.textContent = "";
+        }
 
+        const order = {
+            contact: {
+                firstName:  firstName.value,
+                lastName: lastName.value,
+                address: address.value,
+                city: city.value,
+                email: email.value,
+            },
+            products: getProductsInArray.map(ele => ele.id),
+        };
+        send(order);
+    });
 }
+
+
+
+function send(order) {
+    fetch("http://localhost:3000/api/products/order", {
+        method: "POST",
+        body: JSON.stringify(order),
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+    })
+
+    .then((res) => res.json())
+    .then((data) => {
+        window.location.href = `../html/confirmation.html?id=${data.orderId}`;
+    })
+    .catch(() => {
+        alert("Une erreur est survenue.")
+    });
+}
+
 

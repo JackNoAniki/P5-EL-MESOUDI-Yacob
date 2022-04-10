@@ -5,7 +5,6 @@ function showOrderIdInDom() {
     const url = new URL(orderUrl); 
     const orderId = document.getElementById("orderId");
     orderId.innerHTML = url.searchParams.get("id");
-    localStorage.clear();
 
 }
 
