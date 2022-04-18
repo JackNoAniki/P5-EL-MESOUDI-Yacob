@@ -1,7 +1,9 @@
 
 allProducts();
 
-
+/** Appel à l'API. La fonction va boucler sur le fichier json afin d'importer tous les éléments nécessaires 
+ * au bon affichage de la page index.html, à savoir les éléments des produits (images, noms, descriptions).
+*/
 function allProducts () {
     fetch("http://localhost:3000/api/products")
         .then(function(res) {
@@ -9,7 +11,7 @@ function allProducts () {
                 return res.json();
             }
         })
-        .catch((error) => {
+        .catch(() => {
             const items = document.querySelector(".items");
             items.innerHTML = "Oups ! Une erreur s'est produite !";
             items.style.textAlign = "center";
@@ -17,7 +19,6 @@ function allProducts () {
         })
         
         .then(function(products) {
-            console.log(products);
             for(let product in products) {
                 const itemLink = document.createElement("a");
                 document.querySelector("#items").appendChild(itemLink);
